@@ -167,6 +167,9 @@ class PasswordGame:
             for j in range(6):
                 self.character_origins[i][j] = "random"  # Mark as random
 
+#******************************************************************************************************************************************
+#------------------------Gentic Algorithm function-------------------------------------------------------------------------------------------
+
     def genetic_algorithm(self):
         population = [text_widget.get("1.0", tk.END).strip() for text_widget in self.text_widgets]
         fitness = [int(result.cget("text").split('/')[0]) for result in self.results]
@@ -174,6 +177,8 @@ class PasswordGame:
             self.random_population()
             return
         
+        #**********
+        #selectio : pick first and second maximum of fitness 
         def select_parent():
             pick = max(fitness)
             parent = population[fitness.index(pick)]
@@ -183,11 +188,16 @@ class PasswordGame:
         parent1, fit1 = select_parent()
         parent2, fit2 = select_parent()
 
+        #---------------------end of selection
+
+
         # Update parent labels
         self.parent1_label.config(text=f"Parent 1: {parent1}")
         self.parent2_label.config(text=f"Parent 2: {parent2}")
 
         new_population = []
+        #*******************
+        #cross-over function : merge the two first answer here 
         for i in range(7):
             s = ""
             for j in range(6):
@@ -198,13 +208,19 @@ class PasswordGame:
                     s += parent2[j]
                     self.character_origins[i][j] = "parent2"  # Track origin
             new_population.append(s)
+        #-------------------------------------end of cross-over function
 
+        
         mutation_rate = self.mutation_rate_slider.get()
+
+        #***********************
+        #mutation
         for i in range(len(new_population)):
             if random.random() < mutation_rate:
                 mutate_point = random.randint(0, 5)
                 new_population[i] = new_population[i][:mutate_point] + random.choice(string.ascii_lowercase) + new_population[i][mutate_point + 1:]
-                self.character_origins[i][mutate_point] = "mutation"  # Track origin
+                self.character_origins[i][mutate_point] = "mutation" #Track origin
+        #--------------------------------end of mutation
 
         for text_widget, new_individual in zip(self.text_widgets, new_population):
             text_widget.delete("1.0", tk.END)
@@ -212,6 +228,9 @@ class PasswordGame:
 
         # Color characters based on their origin
         self.color_characters()
+
+#*****************************************************************************************************************************************
+#------------------------------------------End of Genetic function------------------------------------------------------------------------
 
     def color_characters(self):
         for i, text_widget in enumerate(self.text_widgets):
